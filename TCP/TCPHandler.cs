@@ -133,7 +133,8 @@ public class TCPHandler {
                 HandleRoomList(client);
                 break;
             case PacketType.UpdateWorld:
-
+                Console.WriteLine( "Received Update World" );
+                HandleUpdateWorld( payload, client );
             default:
                 Console.WriteLine($"Unknown Packet Type: {pktType}");
                 break;
@@ -296,23 +297,23 @@ public class TCPHandler {
     }
 
     /**
-     * Gets called whenever the client requests to update the world
-     */
-        private async Task HandleUpdateWorld( byte[] data, TcpClient client )
+    * Gets called whenever the client requests to update the world
+    */
+    private async Task HandleUpdateWorld( byte[] data, TcpClient client )
+    {
+        if ( !_tcpToOid.TryGetValue( client, out var oid ) )
+            return;
+
+        var room = GetRoomForPeer( oid );
+        if ( room == null )
+            return;
+
+        if ( room.Id == oid )
         {
-            if ( !_tcpToOid.TryGetValue( client, out var oid ) )
-                return;
-
-            var room = GetRoomForPeer( oid );
-            if ( room == null )
-                return;
-
-            if ( room.Id == oid )
-            {
-                var world_id = (uint) ByteUtils.UnpackU32( data, 0 );
-                Console.WriteLine( $"Host {oid} requested updating the world to {world_id}" );
-                room.World = world_id;
-            }
+            var world_id = (uint) ByteUtils.UnpackU32( data, 0 );
+            Console.WriteLine( $"Host {oid} requested updating the world to {world_id}" );
+            room.World = world_id;
+        }
         }
 
     /**
