@@ -19,7 +19,7 @@ public class Room {
     [JsonPropertyName("flags")]
     public RoomFlags Flags { get; }
     [JsonPropertyName("world")]
-    public uint World { get; private set; }
+    public uint World { get; set; }
 
     private readonly Dictionary<string, int> _oidToNid = new();
     public readonly Dictionary<string, TcpClient> Clients = new();
