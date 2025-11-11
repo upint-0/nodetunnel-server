@@ -289,7 +289,7 @@ public class TCPHandler {
             msg.AddRange(ByteUtils.PackU32((uint)room.Name.Length));
             msg.AddRange(Encoding.UTF8.GetBytes(room.Name));
             msg.AddRange(ByteUtils.PackU32((uint)room.Flags));
-            msg.AddRange(ByteUtils.PackU32((uint)room.World))
+            msg.AddRange( ByteUtils.PackU32( ( uint ) room.World ) );
         }
 
         await SendTcpMessage(client, msg.ToArray());
