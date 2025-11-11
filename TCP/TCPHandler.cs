@@ -309,7 +309,7 @@ public class TCPHandler {
 
             if ( room.Id == oid )
             {
-                var world_id = ( int ) ByteUtils.UnpackU32( data, 0 );
+                var world_id = (uint) ByteUtils.UnpackU32( data, 0 );
                 Console.WriteLine( $"Host {oid} requested updating the world to {world_id}" );
                 room.World = world_id;
             }
