@@ -1,3 +1,4 @@
+using System;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -17,12 +18,14 @@ public class Room {
     public string Name { get; }
     [JsonPropertyName("flags")]
     public RoomFlags Flags { get; }
+    [JsonPropertyName("world")]
+    public uint World { get; private set; }
 
     private readonly Dictionary<string, int> _oidToNid = new();
     public readonly Dictionary<string, TcpClient> Clients = new();
     private int _nextNid = 2; 
 
-    public Room(string id, TcpClient hostClient, string name, RoomFlags flags) {
+    public Room(string id, TcpClient hostClient, string name, RoomFlags flags, uint world) {
         Id = id;
         _oidToNid[id] = 1;
         
@@ -30,6 +33,7 @@ public class Room {
 
         Name = name;
         Flags = flags;
+        World = world;
     }
 
     public int AddPeer(string oid, TcpClient client) {

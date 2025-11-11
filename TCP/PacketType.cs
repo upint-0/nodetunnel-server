@@ -6,5 +6,6 @@ public enum PacketType {
     Join,
     PeerList,
     LeaveRoom,
-    RoomList
+    RoomList,
+    UpdateWorld
 }

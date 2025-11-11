@@ -1,8 +1,10 @@
+using System;
 using System.Buffers.Binary;
 using System.Collections.Concurrent;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 using NodeTunnel.UDP;
 using NodeTunnel.Utils;
 
@@ -130,6 +132,8 @@ public class TCPHandler {
                 Console.WriteLine("Received Room List");
                 HandleRoomList(client);
                 break;
+            case PacketType.UpdateWorld:
+
             default:
                 Console.WriteLine($"Unknown Packet Type: {pktType}");
                 break;
@@ -170,7 +174,7 @@ public class TCPHandler {
         
         var flags = ByteUtils.UnpackU32(data, offset);
         
-        var room = new Room(oid, client, name, (RoomFlags)flags);
+        var room = new Room(oid, client, name, (RoomFlags)flags, 0);
         _rooms[oid] = room;
         
         Console.WriteLine($"Created Room For Peer: {oid}");
@@ -285,10 +289,31 @@ public class TCPHandler {
             msg.AddRange(ByteUtils.PackU32((uint)room.Name.Length));
             msg.AddRange(Encoding.UTF8.GetBytes(room.Name));
             msg.AddRange(ByteUtils.PackU32((uint)room.Flags));
+            msg.AddRange(ByteUtils.PackU32((uint)room.World))
         }
 
         await SendTcpMessage(client, msg.ToArray());
     }
+
+    /**
+     * Gets called whenever the client requests to update the world
+     */
+        private async Task HandleUpdateWorld( byte[] data, TcpClient client )
+        {
+            if ( !_tcpToOid.TryGetValue( client, out var oid ) )
+                return;
+
+            var room = GetRoomForPeer( oid );
+            if ( room == null )
+                return;
+
+            if ( room.Id == oid )
+            {
+                var world_id = ( int ) ByteUtils.UnpackU32( data, 0 );
+                Console.WriteLine( $"Host {oid} requested updating the world to {world_id}" );
+                room.World = world_id;
+            }
+        }
 
     /**
      * Gets the room that the given peer is in
