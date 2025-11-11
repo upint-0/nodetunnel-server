@@ -135,6 +135,7 @@ public class TCPHandler {
             case PacketType.UpdateWorld:
                 Console.WriteLine( "Received Update World" );
                 HandleUpdateWorld( payload, client );
+                break;
             default:
                 Console.WriteLine($"Unknown Packet Type: {pktType}");
                 break;
